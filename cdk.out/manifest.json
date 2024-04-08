@@ -1,0 +1,378 @@
+{
+  "version": "36.0.0",
+  "artifacts": {
+    "byeee.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "byeee.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "byeee": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "byeee.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "project-domain": "travel",
+          "project-name": "byeee"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/2ad280d6a8346ada8ac1c259b9523b9dade4a1177a398041d6df2d90e05d11ad.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "byeee.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "byeee.assets"
+      ],
+      "metadata": {
+        "/byeee": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "project-domain",
+                "Value": "travel"
+              },
+              {
+                "Key": "project-name",
+                "Value": "byeee"
+              }
+            ]
+          }
+        ],
+        "/byeee/table/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "table8235A42E"
+          }
+        ],
+        "/byeee/bucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "bucket43879C71"
+          }
+        ],
+        "/byeee/bucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "bucketPolicy638F945D"
+          }
+        ],
+        "/byeee/secret/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "secret4DA88516"
+          }
+        ],
+        "/byeee/api/proxy/proxy/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "proxyServiceRole25027C0B"
+          }
+        ],
+        "/byeee/api/proxy/proxy/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "proxyServiceRoleDefaultPolicyF294943C"
+          }
+        ],
+        "/byeee/api/proxy/proxy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "proxy64C83D10"
+          }
+        ],
+        "/byeee/api/auth/auth/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authServiceRoleF4812938"
+          }
+        ],
+        "/byeee/api/auth/auth/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authServiceRoleDefaultPolicy370CE486"
+          }
+        ],
+        "/byeee/api/auth/auth/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authD88285D7"
+          }
+        ],
+        "/byeee/api/auth-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authrole98FCF49E"
+          }
+        ],
+        "/byeee/api/authorizer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authorizerD23CB5CD"
+          }
+        ],
+        "/byeee/api/authorizer/authorizerInvokePolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authorizerauthorizerInvokePolicy28B346B2"
+          }
+        ],
+        "/byeee/api/gateway/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayB15F83BA"
+          }
+        ],
+        "/byeee/api/gateway/CloudWatchRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayCloudWatchRole95D07D64"
+          }
+        ],
+        "/byeee/api/gateway/Account": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayAccountCD2885BD"
+          }
+        ],
+        "/byeee/api/gateway/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayDeploymentB2283F364de9267c7111730a6108362f192e18e8"
+          }
+        ],
+        "/byeee/api/gateway/DeploymentStage.dev/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayDeploymentStagedevC9720237"
+          }
+        ],
+        "/byeee/api/gateway/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayEndpointDA8D204E"
+          }
+        ],
+        "/byeee/api/gateway/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayOPTIONS2902486D"
+          }
+        ],
+        "/byeee/api/gateway/Default/auth/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayauthF2D5491A"
+          }
+        ],
+        "/byeee/api/gateway/Default/auth/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayauthOPTIONS96CB5BC5"
+          }
+        ],
+        "/byeee/api/gateway/Default/auth/{proxy+}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayauthproxyB8F0C0E7"
+          }
+        ],
+        "/byeee/api/gateway/Default/auth/{proxy+}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayauthproxyOPTIONSDF5811DB"
+          }
+        ],
+        "/byeee/api/gateway/Default/auth/{proxy+}/ANY/ApiPermission.byeeeapigatewayBEDC9E13.ANY..auth.{proxy+}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayauthproxyANYApiPermissionbyeeeapigatewayBEDC9E13ANYauthproxy46A4BDCE"
+          }
+        ],
+        "/byeee/api/gateway/Default/auth/{proxy+}/ANY/ApiPermission.Test.byeeeapigatewayBEDC9E13.ANY..auth.{proxy+}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayauthproxyANYApiPermissionTestbyeeeapigatewayBEDC9E13ANYauthproxyDA2BCB45"
+          }
+        ],
+        "/byeee/api/gateway/Default/auth/{proxy+}/ANY/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayauthproxyANYD123645A"
+          }
+        ],
+        "/byeee/api/gateway/Default/swagger/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayswagger9DE6A09E"
+          }
+        ],
+        "/byeee/api/gateway/Default/swagger/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayswaggerOPTIONS44C7E964"
+          }
+        ],
+        "/byeee/api/gateway/Default/swagger/{doctype}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayswaggerdoctypeEA2A3AFD"
+          }
+        ],
+        "/byeee/api/gateway/Default/swagger/{doctype}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayswaggerdoctypeOPTIONS40DC6113"
+          }
+        ],
+        "/byeee/api/gateway/Default/swagger/{doctype}/GET/ApiPermission.byeeeapigatewayBEDC9E13.GET..swagger.{doctype}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayswaggerdoctypeGETApiPermissionbyeeeapigatewayBEDC9E13GETswaggerdoctypeCFA103B5"
+          }
+        ],
+        "/byeee/api/gateway/Default/swagger/{doctype}/GET/ApiPermission.Test.byeeeapigatewayBEDC9E13.GET..swagger.{doctype}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayswaggerdoctypeGETApiPermissionTestbyeeeapigatewayBEDC9E13GETswaggerdoctype92CF9616"
+          }
+        ],
+        "/byeee/api/gateway/Default/swagger/{doctype}/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayswaggerdoctypeGET5928FB2A"
+          }
+        ],
+        "/byeee/api/gateway/Default/{proxy+}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayproxy0BE09768"
+          }
+        ],
+        "/byeee/api/gateway/Default/{proxy+}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayproxyOPTIONS6BA621E0"
+          }
+        ],
+        "/byeee/api/gateway/Default/{proxy+}/ANY/ApiPermission.byeeeapigatewayBEDC9E13.ANY..{proxy+}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayproxyANYApiPermissionbyeeeapigatewayBEDC9E13ANYproxyFB25EBBD"
+          }
+        ],
+        "/byeee/api/gateway/Default/{proxy+}/ANY/ApiPermission.Test.byeeeapigatewayBEDC9E13.ANY..{proxy+}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayproxyANYApiPermissionTestbyeeeapigatewayBEDC9E13ANYproxyA42DED7A"
+          }
+        ],
+        "/byeee/api/gateway/Default/{proxy+}/ANY/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayproxyANY8890E765"
+          }
+        ],
+        "/byeee/api/gateway/Default/ANY/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gatewayANY1507BFB7"
+          }
+        ],
+        "/byeee/api/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/byeee/api/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/byeee/api/reference-to-byeeesecret77D47513Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetobyeeesecret77D47513Ref"
+          }
+        ],
+        "/byeee/api/reference-to-byeeetable4C4377E1Arn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetobyeeetable4C4377E1Arn"
+          }
+        ],
+        "/byeee/api/reference-to-byeeebucket161036D5Arn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetobyeeebucket161036D5Arn"
+          }
+        ],
+        "/byeee/api/reference-to-byeeetable4C4377E1Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetobyeeetable4C4377E1Ref"
+          }
+        ],
+        "/byeee/api/reference-to-byeeebucket161036D5Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetobyeeebucket161036D5Ref"
+          }
+        ],
+        "/byeee/api.NestedStack/api.NestedStackResource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "apiNestedStackapiNestedStackResourceDFDE5E1E"
+          }
+        ],
+        "/byeee/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/byeee/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/byeee/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/byeee/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "byeee"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,1854 @@
+{
+ "Resources": {
+  "proxyServiceRole25027C0B": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "project-domain",
+      "Value": "travel"
+     },
+     {
+      "Key": "project-name",
+      "Value": "byeee"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/proxy/proxy/ServiceRole/Resource"
+   }
+  },
+  "proxyServiceRoleDefaultPolicyF294943C": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "referencetobyeeesecret77D47513Ref"
+       }
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetobyeeetable4C4377E1Arn"
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
+        "s3:Abort*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetobyeeebucket161036D5Arn"
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "referencetobyeeebucket161036D5Arn"
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "proxyServiceRoleDefaultPolicyF294943C",
+    "Roles": [
+     {
+      "Ref": "proxyServiceRole25027C0B"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/proxy/proxy/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "proxy64C83D10": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ImageUri": {
+      "Fn::Join": [
+       "",
+       [
+        {
+         "Ref": "AWS::AccountId"
+        },
+        ".dkr.ecr.",
+        {
+         "Ref": "AWS::Region"
+        },
+        ".",
+        {
+         "Ref": "AWS::URLSuffix"
+        },
+        "/",
+        {
+         "Fn::Sub": "cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}"
+        },
+        ":7775f1c355e6252e2ead266f0c3662f7da417d62cb8925a22aa2b5820089c0f2"
+       ]
+      ]
+     }
+    },
+    "Environment": {
+     "Variables": {
+      "SECRET": {
+       "Fn::Join": [
+        "-",
+        [
+         {
+          "Fn::Select": [
+           0,
+           {
+            "Fn::Split": [
+             "-",
+             {
+              "Fn::Select": [
+               6,
+               {
+                "Fn::Split": [
+                 ":",
+                 {
+                  "Ref": "referencetobyeeesecret77D47513Ref"
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "Fn::Select": [
+           1,
+           {
+            "Fn::Split": [
+             "-",
+             {
+              "Fn::Select": [
+               6,
+               {
+                "Fn::Split": [
+                 ":",
+                 {
+                  "Ref": "referencetobyeeesecret77D47513Ref"
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       ]
+      },
+      "TABLE": {
+       "Ref": "referencetobyeeetable4C4377E1Ref"
+      },
+      "BUCKET": {
+       "Ref": "referencetobyeeebucket161036D5Ref"
+      }
+     }
+    },
+    "ImageConfig": {
+     "Command": [
+      "api.handler.lambda_handler"
+     ]
+    },
+    "MemorySize": 528,
+    "PackageType": "Image",
+    "Role": {
+     "Fn::GetAtt": [
+      "proxyServiceRole25027C0B",
+      "Arn"
+     ]
+    },
+    "Tags": [
+     {
+      "Key": "project-domain",
+      "Value": "travel"
+     },
+     {
+      "Key": "project-name",
+      "Value": "byeee"
+     }
+    ],
+    "Timeout": 60
+   },
+   "DependsOn": [
+    "proxyServiceRoleDefaultPolicyF294943C",
+    "proxyServiceRole25027C0B"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/proxy/proxy/Resource"
+   }
+  },
+  "authServiceRoleF4812938": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "project-domain",
+      "Value": "travel"
+     },
+     {
+      "Key": "project-name",
+      "Value": "byeee"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/auth/auth/ServiceRole/Resource"
+   }
+  },
+  "authServiceRoleDefaultPolicy370CE486": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "referencetobyeeesecret77D47513Ref"
+       }
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetobyeeetable4C4377E1Arn"
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
+        "s3:Abort*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetobyeeebucket161036D5Arn"
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "referencetobyeeebucket161036D5Arn"
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "authServiceRoleDefaultPolicy370CE486",
+    "Roles": [
+     {
+      "Ref": "authServiceRoleF4812938"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/auth/auth/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "authD88285D7": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ImageUri": {
+      "Fn::Join": [
+       "",
+       [
+        {
+         "Ref": "AWS::AccountId"
+        },
+        ".dkr.ecr.",
+        {
+         "Ref": "AWS::Region"
+        },
+        ".",
+        {
+         "Ref": "AWS::URLSuffix"
+        },
+        "/",
+        {
+         "Fn::Sub": "cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}"
+        },
+        ":7775f1c355e6252e2ead266f0c3662f7da417d62cb8925a22aa2b5820089c0f2"
+       ]
+      ]
+     }
+    },
+    "Environment": {
+     "Variables": {
+      "SECRET": {
+       "Fn::Join": [
+        "-",
+        [
+         {
+          "Fn::Select": [
+           0,
+           {
+            "Fn::Split": [
+             "-",
+             {
+              "Fn::Select": [
+               6,
+               {
+                "Fn::Split": [
+                 ":",
+                 {
+                  "Ref": "referencetobyeeesecret77D47513Ref"
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "Fn::Select": [
+           1,
+           {
+            "Fn::Split": [
+             "-",
+             {
+              "Fn::Select": [
+               6,
+               {
+                "Fn::Split": [
+                 ":",
+                 {
+                  "Ref": "referencetobyeeesecret77D47513Ref"
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       ]
+      },
+      "TABLE": {
+       "Ref": "referencetobyeeetable4C4377E1Ref"
+      },
+      "BUCKET": {
+       "Ref": "referencetobyeeebucket161036D5Ref"
+      }
+     }
+    },
+    "ImageConfig": {
+     "Command": [
+      "auth.handler.lambda_handler"
+     ]
+    },
+    "MemorySize": 528,
+    "PackageType": "Image",
+    "Role": {
+     "Fn::GetAtt": [
+      "authServiceRoleF4812938",
+      "Arn"
+     ]
+    },
+    "Tags": [
+     {
+      "Key": "project-domain",
+      "Value": "travel"
+     },
+     {
+      "Key": "project-name",
+      "Value": "byeee"
+     }
+    ],
+    "Timeout": 60
+   },
+   "DependsOn": [
+    "authServiceRoleDefaultPolicy370CE486",
+    "authServiceRoleF4812938"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/auth/auth/Resource"
+   }
+  },
+  "authrole98FCF49E": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "lambda:InvokeFunction",
+          "lambda:GetFunction",
+          "lambda:ListFunctions"
+         ],
+         "Effect": "Allow",
+         "Resource": [
+          {
+           "Fn::GetAtt": [
+            "proxy64C83D10",
+            "Arn"
+           ]
+          },
+          {
+           "Fn::GetAtt": [
+            "authD88285D7",
+            "Arn"
+           ]
+          }
+         ]
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "auth-polices"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "project-domain",
+      "Value": "travel"
+     },
+     {
+      "Key": "project-name",
+      "Value": "byeee"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/auth-role/Resource"
+   }
+  },
+  "authorizerD23CB5CD": {
+   "Type": "AWS::ApiGateway::Authorizer",
+   "Properties": {
+    "AuthorizerCredentials": {
+     "Fn::GetAtt": [
+      "authrole98FCF49E",
+      "Arn"
+     ]
+    },
+    "AuthorizerResultTtlInSeconds": 300,
+    "AuthorizerUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Fn::Select": [
+         1,
+         {
+          "Fn::Split": [
+           ":",
+           {
+            "Fn::GetAtt": [
+             "authD88285D7",
+             "Arn"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       ":apigateway:",
+       {
+        "Fn::Select": [
+         3,
+         {
+          "Fn::Split": [
+           ":",
+           {
+            "Fn::GetAtt": [
+             "authD88285D7",
+             "Arn"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       ":lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "authD88285D7",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    },
+    "IdentitySource": "method.request.header.authorizationToken",
+    "Name": "byeeeapiauthorizerC7CCF338",
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    },
+    "Type": "REQUEST"
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/authorizer/Resource"
+   }
+  },
+  "authorizerauthorizerInvokePolicy28B346B2": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "authD88285D7",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "authD88285D7",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "authorizerauthorizerInvokePolicy28B346B2",
+    "Roles": [
+     {
+      "Ref": "authrole98FCF49E"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/authorizer/authorizerInvokePolicy/Resource"
+   }
+  },
+  "gatewayB15F83BA": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "EndpointConfiguration": {
+     "Types": [
+      "REGIONAL"
+     ]
+    },
+    "Name": "gateway",
+    "Tags": [
+     {
+      "Key": "project-domain",
+      "Value": "travel"
+     },
+     {
+      "Key": "project-name",
+      "Value": "byeee"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Resource"
+   }
+  },
+  "gatewayCloudWatchRole95D07D64": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "project-domain",
+      "Value": "travel"
+     },
+     {
+      "Key": "project-name",
+      "Value": "byeee"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/CloudWatchRole/Resource"
+   }
+  },
+  "gatewayAccountCD2885BD": {
+   "Type": "AWS::ApiGateway::Account",
+   "Properties": {
+    "CloudWatchRoleArn": {
+     "Fn::GetAtt": [
+      "gatewayCloudWatchRole95D07D64",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "gatewayB15F83BA"
+   ],
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Account"
+   }
+  },
+  "gatewayDeploymentB2283F364de9267c7111730a6108362f192e18e8": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Automatically created by the RestApi construct",
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "DependsOn": [
+    "gatewayproxyANY8890E765",
+    "gatewayproxyOPTIONS6BA621E0",
+    "gatewayproxy0BE09768",
+    "gatewayANY1507BFB7",
+    "gatewayauthproxyANYD123645A",
+    "gatewayauthproxyOPTIONSDF5811DB",
+    "gatewayauthproxyB8F0C0E7",
+    "gatewayauthOPTIONS96CB5BC5",
+    "gatewayauthF2D5491A",
+    "gatewayOPTIONS2902486D",
+    "gatewayswaggerdoctypeGET5928FB2A",
+    "gatewayswaggerdoctypeOPTIONS40DC6113",
+    "gatewayswaggerdoctypeEA2A3AFD",
+    "gatewayswaggerOPTIONS44C7E964",
+    "gatewayswagger9DE6A09E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Deployment/Resource"
+   }
+  },
+  "gatewayDeploymentStagedevC9720237": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "gatewayDeploymentB2283F364de9267c7111730a6108362f192e18e8"
+    },
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    },
+    "StageName": "dev",
+    "Tags": [
+     {
+      "Key": "project-domain",
+      "Value": "travel"
+     },
+     {
+      "Key": "project-name",
+      "Value": "byeee"
+     }
+    ]
+   },
+   "DependsOn": [
+    "gatewayAccountCD2885BD"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/DeploymentStage.dev/Resource"
+   }
+  },
+  "gatewayOPTIONS2902486D": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "gatewayB15F83BA",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/OPTIONS/Resource"
+   }
+  },
+  "gatewayauthF2D5491A": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "gatewayB15F83BA",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "auth",
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/auth/Resource"
+   }
+  },
+  "gatewayauthOPTIONS96CB5BC5": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "gatewayauthF2D5491A"
+    },
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/auth/OPTIONS/Resource"
+   }
+  },
+  "gatewayauthproxyB8F0C0E7": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "gatewayauthF2D5491A"
+    },
+    "PathPart": "{proxy+}",
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/auth/{proxy+}/Resource"
+   }
+  },
+  "gatewayauthproxyOPTIONSDF5811DB": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "gatewayauthproxyB8F0C0E7"
+    },
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/auth/{proxy+}/OPTIONS/Resource"
+   }
+  },
+  "gatewayauthproxyANYApiPermissionbyeeeapigatewayBEDC9E13ANYauthproxy46A4BDCE": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "proxy64C83D10",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "gatewayB15F83BA"
+       },
+       "/",
+       {
+        "Ref": "gatewayDeploymentStagedevC9720237"
+       },
+       "/*/auth/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/auth/{proxy+}/ANY/ApiPermission.byeeeapigatewayBEDC9E13.ANY..auth.{proxy+}"
+   }
+  },
+  "gatewayauthproxyANYApiPermissionTestbyeeeapigatewayBEDC9E13ANYauthproxyDA2BCB45": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "proxy64C83D10",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "gatewayB15F83BA"
+       },
+       "/test-invoke-stage/*/auth/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/auth/{proxy+}/ANY/ApiPermission.Test.byeeeapigatewayBEDC9E13.ANY..auth.{proxy+}"
+   }
+  },
+  "gatewayauthproxyANYD123645A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "ANY",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "proxy64C83D10",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "gatewayauthproxyB8F0C0E7"
+    },
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/auth/{proxy+}/ANY/Resource"
+   }
+  },
+  "gatewayswagger9DE6A09E": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "gatewayB15F83BA",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "swagger",
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/swagger/Resource"
+   }
+  },
+  "gatewayswaggerOPTIONS44C7E964": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "gatewayswagger9DE6A09E"
+    },
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/swagger/OPTIONS/Resource"
+   }
+  },
+  "gatewayswaggerdoctypeEA2A3AFD": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "gatewayswagger9DE6A09E"
+    },
+    "PathPart": "{doctype}",
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/swagger/{doctype}/Resource"
+   }
+  },
+  "gatewayswaggerdoctypeOPTIONS40DC6113": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "gatewayswaggerdoctypeEA2A3AFD"
+    },
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/swagger/{doctype}/OPTIONS/Resource"
+   }
+  },
+  "gatewayswaggerdoctypeGETApiPermissionbyeeeapigatewayBEDC9E13GETswaggerdoctypeCFA103B5": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "proxy64C83D10",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "gatewayB15F83BA"
+       },
+       "/",
+       {
+        "Ref": "gatewayDeploymentStagedevC9720237"
+       },
+       "/GET/swagger/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/swagger/{doctype}/GET/ApiPermission.byeeeapigatewayBEDC9E13.GET..swagger.{doctype}"
+   }
+  },
+  "gatewayswaggerdoctypeGETApiPermissionTestbyeeeapigatewayBEDC9E13GETswaggerdoctype92CF9616": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "proxy64C83D10",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "gatewayB15F83BA"
+       },
+       "/test-invoke-stage/GET/swagger/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/swagger/{doctype}/GET/ApiPermission.Test.byeeeapigatewayBEDC9E13.GET..swagger.{doctype}"
+   }
+  },
+  "gatewayswaggerdoctypeGET5928FB2A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "proxy64C83D10",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "gatewayswaggerdoctypeEA2A3AFD"
+    },
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/swagger/{doctype}/GET/Resource"
+   }
+  },
+  "gatewayproxy0BE09768": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "gatewayB15F83BA",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "{proxy+}",
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/{proxy+}/Resource"
+   }
+  },
+  "gatewayproxyOPTIONS6BA621E0": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "gatewayproxy0BE09768"
+    },
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/{proxy+}/OPTIONS/Resource"
+   }
+  },
+  "gatewayproxyANYApiPermissionbyeeeapigatewayBEDC9E13ANYproxyFB25EBBD": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "proxy64C83D10",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "gatewayB15F83BA"
+       },
+       "/",
+       {
+        "Ref": "gatewayDeploymentStagedevC9720237"
+       },
+       "/*/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/{proxy+}/ANY/ApiPermission.byeeeapigatewayBEDC9E13.ANY..{proxy+}"
+   }
+  },
+  "gatewayproxyANYApiPermissionTestbyeeeapigatewayBEDC9E13ANYproxyA42DED7A": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "proxy64C83D10",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "gatewayB15F83BA"
+       },
+       "/test-invoke-stage/*/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/{proxy+}/ANY/ApiPermission.Test.byeeeapigatewayBEDC9E13.ANY..{proxy+}"
+   }
+  },
+  "gatewayproxyANY8890E765": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "authorizerD23CB5CD"
+    },
+    "HttpMethod": "ANY",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "proxy64C83D10",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "gatewayproxy0BE09768"
+    },
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/{proxy+}/ANY/Resource"
+   }
+  },
+  "gatewayANY1507BFB7": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "ANY",
+    "Integration": {
+     "Type": "MOCK"
+    },
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "gatewayB15F83BA",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "gatewayB15F83BA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/gateway/Default/ANY/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WQwW7CMAyGn2X3kMGQdmegSTtsq8oDIJOa4tHGXeyIdVXffUoArZz82f9vO/GTXSyf7fwBzjJz1WnW0N4OHyiK1VbBnQycZTegCzsQQRW7YXfC8NZCjatUMeiCLbFjIeXQv4CgaaDdV2CHifc1eqfE3qwPfsoFhpZEiP1oCFo7lNxgEnIsuCHXZ1+m0UBHNSieobdDid8RRVdRjxzoF0MyTrIyiR3laf+4co6jV7PBruG+Ra+pOsm2CnV+wgVKFI7BYf7ZO+qRqyRe6aZel1y4CPzT37JxNPlQaRr5+q7jM2oX9a53ffBr9hVpPknR65H949Iu5nYxf/gSolmIXqlFW17iHz/3Ke3CAQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "byeee/api/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Outputs": {
+  "gatewayEndpointDA8D204E": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "gatewayB15F83BA"
+      },
+      ".execute-api.",
+      {
+       "Ref": "AWS::Region"
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "gatewayDeploymentStagedevC9720237"
+      },
+      "/"
+     ]
+    ]
+   }
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-2"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "Parameters": {
+  "referencetobyeeesecret77D47513Ref": {
+   "Type": "String"
+  },
+  "referencetobyeeetable4C4377E1Arn": {
+   "Type": "String"
+  },
+  "referencetobyeeebucket161036D5Arn": {
+   "Type": "String"
+  },
+  "referencetobyeeetable4C4377E1Ref": {
+   "Type": "String"
+  },
+  "referencetobyeeebucket161036D5Ref": {
+   "Type": "String"
+  }
+ }
+}
