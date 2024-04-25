@@ -1,12 +1,12 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(__file__))
+
 from mangum import Mangum
 
 from common.log import logger
-from application import app, ExceptionLoggingMiddleware
-
-
-# app.add_middleware(ExceptionLoggingMiddleware)
-# app.include_router(trips.router)
-# app.include_router(itinerary.router)
+from config.application import app, ExceptionLoggingMiddleware
 
 
 @logger.inject_lambda_context(log_event=True, clear_state=True)

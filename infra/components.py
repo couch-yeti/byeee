@@ -2,7 +2,7 @@ import os
 from typing import Optional, Dict
 
 import aws_cdk as cdk
-from aws_cdk import aws_dynamodb, aws_lambda, aws_ecr_assets
+from aws_cdk import aws_dynamodb, aws_lambda, aws_ecr_assets, aws_ecr
 from constructs import Construct
 
 
@@ -11,7 +11,7 @@ class Func(Construct):
         self,
         scope: Construct,
         cid: str,
-        handler: str,
+        path: str,
         environment: Dict[str, str] = None,
         memory_size: int = 528,
         duration: cdk.Duration = cdk.Duration.seconds(amount=60),
@@ -19,31 +19,29 @@ class Func(Construct):
     ):
         super().__init__(scope=scope, id=cid, **kw)
         self.name = cid
-        self.handler = handler
+        self.path = path
         self.environment = environment or {}
-        self.docker_image = self._create_image()
+        self.repo = self._get_repo()
         self.function = aws_lambda.DockerImageFunction(
             scope=self,
             id=cid,
             code=aws_lambda.DockerImageCode.from_ecr(
-                repository=self.docker_image.repository,
-                tag_or_digest=self.docker_image.asset_hash,
-                cmd=[self.handler],
+                repository=self.repo,
+                cmd=[self.path],
+                tag_or_digest="1.0.3",
             ),
             memory_size=memory_size,
             timeout=duration,
             environment=environment,
         )
 
-    def _create_image(self):
-        """function assumes both the app.py file and the Dockerfile are at root"""
+    def _get_repo(self):
 
-        docker_image = aws_ecr_assets.DockerImageAsset(
+        return aws_ecr.Repository.from_repository_arn(
             scope=self,
-            id=f"{self.name}-image",
-            directory=os.getcwd(),
+            id="repo",
+            repository_arn="arn:aws:ecr:us-west-2:911808035826:repository/byeee-repo",
         )
-        return docker_image
 
 
 class Table(Construct):

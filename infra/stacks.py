@@ -8,6 +8,7 @@ from aws_cdk import (
     aws_s3,
     aws_secretsmanager,
     aws_lambda,
+    aws_ecr_assets,
 )
 
 from infra.components import Func
@@ -24,12 +25,12 @@ class ApiStack(cdk.NestedStack):
         self.api_lambda = Func(
             scope=self,
             cid="proxy",
-            handler="api.handler.lambda_handler",
+            path="api.handler.lambda_handler",
         )
         self.auth_lambda = Func(
             scope=self,
             cid="auth",
-            handler="auth.handler.lambda_handler",
+            path="auth.handler.lambda_handler",
         )
 
     def create_rest_gateway(self):
@@ -104,9 +105,8 @@ class ApiStack(cdk.NestedStack):
                 self.api_lambda.function
             ),
         )
-        self.api_swagger_proxy = self.api_swagger_resource.add_resource(
-            "{doctype}"
-        )
+        self.api_swagger_proxy = self.api_swagger_resource.add_proxy()
+
         self.api_swagger_method = self.api_swagger_proxy.add_method(
             "GET",
             method_responses=[
@@ -129,7 +129,7 @@ class MainStack(cdk.Stack):
 
     def __init__(self, scope, name):
         super().__init__(scope=scope, id=name)
-        self.create_data_layer()
+        self._create_data_layer()
         self.api_stack = ApiStack(scope=self, cid="api")
         functions = [
             self.api_stack.api_lambda.function,
@@ -138,7 +138,7 @@ class MainStack(cdk.Stack):
         for function in functions:
             self.set_lambda_env_perms(function)
 
-    def create_data_layer(self):
+    def _create_data_layer(self):
         self.table = aws_dynamodb.Table(
             scope=self,
             id="table",

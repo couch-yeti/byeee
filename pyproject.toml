@@ -10,6 +10,7 @@ packages = [
     {include = "agents", from = "src/api"},
     {include = "routes", from = "src/api"},
     {include = "templates", from = "src/api"},
+    {include = "config", from = "src/api"},
     {include = "auth", from = "src"},
     {include = "common", from ="src"}
 ]
